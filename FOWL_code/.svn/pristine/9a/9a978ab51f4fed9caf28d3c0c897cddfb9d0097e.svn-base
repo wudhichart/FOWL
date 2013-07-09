@@ -1,0 +1,105 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using org.semanticweb.owlapi.model;
+using org.semanticweb.owlapi.apibinding;
+using java.util;
+using org.semanticweb.owlapi.io;
+using System.IO;
+
+namespace TestIntegration
+{
+    class JAVAOWLAPImp : JAVAOWLAPI
+    {
+        OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
+        String file;
+        OWLOntology localont;
+
+        int class_size;
+        int property_size;
+        int tbox_size;
+
+        public JAVAOWLAPImp(String file)
+        {
+            
+            this.file = file;
+            java.io.File javafile = new java.io.File(this.file);
+            this.localont = manager.loadOntologyFromOntologyDocument(javafile);
+
+            class_size = this.localont.getClassesInSignature(true).size();
+            property_size = this.localont.getObjectPropertiesInSignature(true).size();
+            tbox_size = this.localont.getTBoxAxioms(true).size();
+        }
+
+        public List<String> getOWLClass()
+        {
+                List<String> owl_class = new List<string>();
+                Iterator it = this.localont.getClassesInSignature(true).iterator();
+                while (it.hasNext())
+                {
+                    owl_class.Add(it.next().ToString());
+                }
+                return owl_class;
+        }
+
+        public List<String> getOWLProperty()
+        {
+                List<String> owl_property = new List<string>();
+                Iterator it = this.localont.getObjectPropertiesInSignature(true).iterator();
+                while (it.hasNext())
+                {
+                    owl_property.Add(it.next().ToString());
+                }
+                return owl_property;
+        }
+
+        public List<String> getTBox()
+        {
+            List<String> tbox = new List<string>();
+            Iterator it = this.localont.getTBoxAxioms(true).iterator();
+            while (it.hasNext())
+            {
+                tbox.Add(it.next().ToString());
+            }
+            return tbox;
+        }
+
+        public List<String> getLogicalAxioms()
+        {
+            List<String> logicalAxioms = new List<string>();
+            Iterator it = this.localont.getLogicalAxioms().iterator();
+            while (it.hasNext())
+            {
+                logicalAxioms.Add(it.next().ToString());
+            }
+            return logicalAxioms;
+        }
+
+        public List<String> getGeneralAxioms()
+        {
+            List<String> generalAxioms = new List<string>();
+            Iterator it = this.localont.getGeneralClassAxioms().iterator();
+            while (it.hasNext())
+            {
+                generalAxioms.Add(it.next().ToString());
+            }
+            return generalAxioms;
+        }
+
+        public int getClassSize()
+        {
+            return class_size;
+        }
+
+        public int getPropertySize()
+        {
+            return property_size;
+        }
+
+        public int getTBoxSize()
+        {
+            return tbox_size;
+        }
+    }
+}

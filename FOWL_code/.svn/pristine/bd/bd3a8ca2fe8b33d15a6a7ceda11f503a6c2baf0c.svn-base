@@ -1,0 +1,20 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+namespace TestIntegration
+{
+    interface JAVAOWLAPI
+    {
+        List<String> getOWLClass();
+        List<String> getOWLProperty();
+        List<String> getTBox();
+        List<String> getLogicalAxioms();
+        List<String> getGeneralAxioms();
+
+        int getClassSize();
+        int getPropertySize();
+        int getTBoxSize();
+    }
+}

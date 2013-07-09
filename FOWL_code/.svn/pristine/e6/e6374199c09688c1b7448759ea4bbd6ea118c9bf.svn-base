@@ -1,0 +1,75 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.IO;
+
+using java.io;
+using org.semanticweb.owlapi.model;
+using org.semanticweb.owlapi.apibinding;
+using org.semanticweb.owlapi.io;
+using java.util;
+using System.Threading.Tasks;
+
+using System.Diagnostics;
+
+/* Test JAVA OWLAPI by using ikvm .NET
+ * Tested ontology
+ * 1. pizza.owl
+ * 2. HOM-PROCS2.owl
+ * 3. functional_syntax.owl
+ * 4. jcel-full-galen.owl
+ * 5. functional_syntax_emap.owl
+ * 6. go.owl
+ * 7. nciOntology.owl
+ * 8. jcel-geneontology.owl
+ * 9. jcel-not-galen.owl
+ * 10.jcel-nci.owl
+ * All ontologies are pass.
+ */
+
+namespace TestIntegration
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            string inputfile = "";
+            string outputfilename = "";
+            for(int i= 0; i<args.Length - 1; i++)
+            {
+                if(args[i] == "-i") inputfile = args[i + 1];
+                if(args[i] == "-o") outputfilename = args[i + 1];
+            }
+            Stopwatch sp = new Stopwatch();
+            System.Console.WriteLine("Start loading ontology......");
+            sp.Start();
+
+            //using converted OWLAPI
+            //JAVAOWLAPI translator = new JAVAOWLAPImp(inputfile);
+            //var t_axioms = Task<List<String>>.Factory.StartNew(() => translator.getLogicalAxioms());
+            //var t_classes = Task<List<String>>.Factory.StartNew(() => translator.getOWLClass());
+            //var t_properties = Task<List<String>>.Factory.StartNew(() => translator.getOWLProperty());
+
+            //Task.WaitAll(t_axioms, t_classes, t_properties);
+
+            //List<String> axioms = t_axioms.Result;
+            //List<String> classes = t_classes.Result;
+            //List<String> properties = t_properties.Result;
+
+            //using our F# OWLReader
+            FOWL.OWLReader.Reader reader = new FOWL.OWLReader.Reader(FOWL.OWLReader.token);
+            List<string> ontology = reader.loadOntologyfromFile(inputfile);
+
+            List<String> axioms = reader.getAxiom(ontology);
+            List<String> classes = reader.getClass(ontology);
+            List<String> properties = reader.getProperty(ontology);
+
+            sp.Stop();
+            System.Console.WriteLine("End loading ontology......");
+            System.Console.WriteLine("Loading Time:" + sp.Elapsed.TotalSeconds + " s.");
+            System.Console.WriteLine("Start Reasoner......");
+            FOWL.OWLReasoner.Reason(classes, properties, axioms, outputfilename);
+        }
+    }
+}

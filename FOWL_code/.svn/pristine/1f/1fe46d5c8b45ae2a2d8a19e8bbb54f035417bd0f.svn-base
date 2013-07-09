@@ -1,0 +1,62 @@
+﻿namespace FOWL
+open System
+open System.Text.RegularExpressions
+open System.Collections.Generic
+open System.Collections
+open System.Collections.Specialized
+open System.Text
+
+open System.IO
+open System.Threading.Tasks
+open System.Diagnostics
+open System.Linq
+
+module OWLReader = 
+    let token = ["Declaration"; "SubClassOf"; "EquivalentClasses"; "SubObjectPropertyOf"; "TransitiveObjectProperty"; "ObjectPropertyDomain"; "ObjectPropertyRange"]
+    type Reader (token:list<string>) =
+        member x.token = token
+        member x.loadOntologyfromFile (owlfile:string) =
+            let ontology = new List<string>()
+            let lineSequence(owlfile) = 
+                let reader = File.OpenText(owlfile) 
+                Seq.unfold(fun line -> 
+                    if line = null then 
+                        reader.Close() 
+                        None 
+                    else 
+                        Some(line,reader.ReadLine())) (reader.ReadLine())
+            let loadOntologyfromFile = 
+                let mutable line = ""
+                for line in lineSequence(owlfile) do
+                    for t in x.token do
+                        if line.Contains(t) then
+                            ontology.Add(line)
+            ontology
+
+        member x.getClass (ontology:List<string>) =
+            let owl_class = new List<String>()
+            let declare = "Declaration(Class("
+            for s in ontology do
+                if s.Contains(declare) then
+                    let ss = s.Substring(declare.Length, s.Length - declare.Length - 2)
+                    owl_class.Add(ss)
+            owl_class
+
+        member x.getProperty (ontology:List<string>) =
+            let owl_property = new List<String>()
+            let declare = "Declaration(ObjectProperty("
+            for s in ontology do
+                if s.Contains(declare) then
+                    let ss = s.Substring(declare.Length, s.Length - declare.Length - 2)
+                    owl_property.Add(ss)
+            owl_property
+
+        member x.getAxiom (ontology:List<string>) =
+            let owl_axiom = new List<String>()
+            let declare = ["SubClassOf"; "EquivalentClasses"; "SubObjectPropertyOf"; "TransitiveObjectProperty"; "ObjectPropertyDomain"; "ObjectPropertyRange"]
+            for s in ontology do
+                for d in declare do
+                    if s.Contains(d) then
+                        owl_axiom.Add(s)
+            owl_axiom
+

@@ -1,0 +1,32 @@
+﻿namespace FOWL
+
+open System
+open System.Text.RegularExpressions
+open System.Collections.Generic
+open System.Collections
+open System.Collections.Specialized
+open System.Collections.Concurrent
+open System.Text
+
+open System.IO
+open System.Threading.Tasks
+open System.Diagnostics
+open System.Linq
+
+module Main =
+    let Run = 
+        let start_time_reader = new Stopwatch();
+        start_time_reader.Start()
+        let reader = new FOWL.OWLReader.Reader(FOWL.OWLReader.token)
+        let ontology = reader.loadOntologyfromFile(@"G:\Monash\Minor Thesis\Phase2\FOWL\FOWL\bin\functionalOntology\functional-jcel-not-galen.owl")
+        let classes = reader.getClass(ontology)
+        let properties = reader.getProperty(ontology)
+        let axioms = reader.getAxiom(ontology)
+
+        start_time_reader.Stop()
+        printfn "Reading Time: %A s." start_time_reader.Elapsed.TotalSeconds
+
+        FOWL.OWLReasoner.Reason classes properties axioms
+
+//Main.Run
+
